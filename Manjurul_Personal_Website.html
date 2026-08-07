@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manjurul Alam, PhD — Computational Bioengineer</title>
+<meta name="description" content="Manjurul Alam, PhD — computational bioengineer working on cerebral aneurysm biomechanics, finite element modeling, and cardiovascular solid mechanics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0e13;
+    --panel:#121820;
+    --panel-2:#161e27;
+    --line: rgba(232,238,243,0.10);
+    --line-strong: rgba(232,238,243,0.18);
+    --text:#e8eef3;
+    --muted:#8fa1b0;
+    --muted-dim:#5f7180;
+    --cool:#3ad6c4;     /* low wall stress */
+    --warm:#f2a154;     /* elevated stress */
+    --hot:#e15b45;      /* peak stress, fundus */
+    --cool-dim: rgba(58,214,196,0.14);
+    --radius: 3px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+
+  a{ color:inherit; text-decoration:none; }
+
+  ::selection{ background:var(--cool-dim); color:var(--text); }
+
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,14,19,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1120px; margin:0 auto; padding:18px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-name{
+    font-family:'Fraunces', serif; font-weight:450; font-size:1.05rem; letter-spacing:0.01em;
+  }
+  .nav-name .dot{ color:var(--cool); }
+  .nav-links{ display:flex; gap:28px; }
+  .nav-links a{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.04em;
+    color:var(--muted); text-transform:uppercase; transition:color .2s ease;
+  }
+  .nav-links a:hover{ color:var(--cool); }
+  .nav-toggle{ display:none; }
+
+  @media (max-width:720px){
+    .nav-links{ display:none; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:96px 0 88px;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:48px;
+    align-items:center;
+  }
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-visual{ order:-1; }
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--cool);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px; background:var(--cool);
+    display:inline-block;
+  }
+
+  h1.display{
+    font-family:'Fraunces', serif;
+    font-weight:450;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 22px;
+  }
+  h1.display em{
+    font-style:italic;
+    font-weight:300;
+    color:var(--muted);
+  }
+
+  .hero-thesis{
+    color:var(--muted);
+    font-size:1.05rem;
+    max-width:46ch;
+    margin:0 0 36px;
+  }
+  .hero-thesis strong{ color:var(--text); font-weight:500; }
+
+  .cta-row{ display:flex; flex-wrap:wrap; gap:12px; }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 18px;
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem;
+    letter-spacing:0.02em;
+    color:var(--text);
+    transition: border-color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .pill:hover{ border-color:var(--cool); background:var(--cool-dim); transform:translateY(-1px); }
+  .pill.solid{ background:var(--cool); color:#06231f; border-color:var(--cool); font-weight:500; }
+  .pill.solid:hover{ background:#4fe8d5; }
+
+  /* ---------- HERO VISUAL: aneurysm mesh ---------- */
+  .hero-visual{ position:relative; }
+  .mesh-figure{ width:100%; height:auto; display:block; }
+  .mesh-pulse{
+    transform-origin: 300px 250px;
+    animation: pulse 4.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); }
+    45%{ transform:scale(1.028); }
+    55%{ transform:scale(1.028); }
+  }
+  .mesh-lines{ animation: shimmer 4.2s ease-in-out infinite; }
+  @keyframes shimmer{
+    0%,100%{ opacity:0.5; }
+    50%{ opacity:0.85; }
+  }
+  .annot{ font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--muted); letter-spacing:0.03em; }
+  .annot-hot{ fill:var(--hot); }
+  .annot-cool{ fill:var(--cool); }
+  .leader{ stroke:var(--line-strong); stroke-width:1; }
+
+  /* ---------- SECTION SCAFFOLDING ---------- */
+  section{ padding:76px 0; border-top:1px solid var(--line); }
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:40px; gap:24px; flex-wrap:wrap;
+  }
+  h2.section-title{
+    font-family:'Fraunces', serif; font-weight:450;
+    font-size:1.9rem; margin:0;
+  }
+  .section-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:0.75rem;
+    color:var(--muted-dim); letter-spacing:0.08em; text-transform:uppercase;
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about-body{ max-width:70ch; color:var(--muted); font-size:1.02rem; }
+  .about-body p{ margin:0 0 18px; }
+  .about-body strong{ color:var(--text); font-weight:500; }
+
+  .stat-row{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); margin-top:44px; border:1px solid var(--line);
+  }
+  .stat{ background:var(--panel); padding:24px 22px; }
+  .stat-num{ font-family:'Fraunces', serif; font-size:2rem; color:var(--cool); }
+  .stat-label{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--muted-dim); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
+  @media (max-width:860px){ .stat-row{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:480px){ .stat-row{ grid-template-columns:1fr; } }
+
+  /* ---------- EXPERIENCE ---------- */
+  .exp-list{ display:flex; flex-direction:column; }
+  .exp-item{
+    display:grid; grid-template-columns:220px 1fr; gap:28px;
+    padding:30px 0; border-bottom:1px solid var(--line);
+  }
+  .exp-item:first-child{ padding-top:0; }
+  @media (max-width:720px){ .exp-item{ grid-template-columns:1fr; gap:10px; } }
+  .exp-when{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--cool); }
+  .exp-loc{ font-family:'IBM Plex Mono', monospace; font-size:0.74rem; color:var(--muted-dim); margin-top:6px; }
+  .exp-role{ font-size:1.08rem; color:var(--text); margin:0 0 2px; font-weight:500; }
+  .exp-org{ font-size:0.92rem; color:var(--muted); margin:0 0 14px; }
+  .exp-bullets{ margin:0; padding-left:18px; color:var(--muted); font-size:0.93rem; }
+  .exp-bullets li{ margin-bottom:8px; }
+  .exp-bullets li:last-child{ margin-bottom:0; }
+
+  /* ---------- RESEARCH CARDS ---------- */
+  .card-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+  }
+  @media (max-width:860px){ .card-grid{ grid-template-columns:1fr; } }
+  .card{
+    background:var(--panel); padding:30px 26px;
+    transition: background .25s ease;
+  }
+  .card:hover{ background:var(--panel-2); }
+  .card-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:var(--warm);
+    letter-spacing:0.06em; text-transform:uppercase; margin-bottom:14px; display:block;
+  }
+  .card h3{
+    font-family:'Fraunces', serif; font-weight:450; font-size:1.15rem; margin:0 0 12px;
+  }
+  .card p{ color:var(--muted); font-size:0.94rem; margin:0; }
+
+  /* ---------- PUBLICATIONS ---------- */
+  .pub-list{ border-top:1px solid var(--line); }
+  .pub{
+    display:grid; grid-template-columns:64px 1fr; gap:24px;
+    padding:26px 0; border-bottom:1px solid var(--line);
+  }
+  .pub-year{ font-family:'IBM Plex Mono', monospace; color:var(--muted-dim); font-size:0.85rem; padding-top:2px; }
+  .pub-title{ font-size:1.02rem; margin:0 0 6px; color:var(--text); }
+  .pub-meta{ font-size:0.88rem; color:var(--muted); margin:0 0 10px; }
+  .pub-link{ font-family:'IBM Plex Mono', monospace; font-size:0.76rem; color:var(--cool); border-bottom:1px solid transparent; }
+  .pub-link:hover{ border-bottom-color:var(--cool); }
+  .pub-note{ font-size:0.82rem; color:var(--muted-dim); margin-top:8px; font-style:italic; }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline{ position:relative; padding-left:28px; border-left:1px solid var(--line-strong); }
+  .tl-item{ position:relative; padding-bottom:38px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{
+    content:""; position:absolute; left:-33px; top:4px;
+    width:9px; height:9px; border-radius:50%;
+    background:var(--ink); border:2px solid var(--cool);
+  }
+  .tl-when{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--cool); margin-bottom:6px; }
+  .tl-title{ font-size:1.05rem; color:var(--text); margin:0 0 4px; font-weight:500;}
+  .tl-place{ font-size:0.92rem; color:var(--muted); margin:0; }
+
+  /* ---------- TOOLKIT ---------- */
+  .chip-row{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace; font-size:0.8rem;
+    padding:8px 14px; border:1px solid var(--line-strong); border-radius:999px;
+    color:var(--muted);
+  }
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  .contact{ text-align:left; }
+  .contact-inner{
+    display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:end;
+  }
+  @media (max-width:780px){ .contact-inner{ grid-template-columns:1fr; } }
+  .contact h2{ font-size:2.2rem; max-width:16ch; }
+  .contact-sub{ color:var(--muted); max-width:44ch; margin:14px 0 0; }
+  .contact-links{ display:flex; flex-direction:column; gap:14px; }
+  .contact-link-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 0; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:0.85rem;
+  }
+  .contact-link-row a{ color:var(--text); }
+  .contact-link-row a:hover{ color:var(--cool); }
+  .contact-link-label{ color:var(--muted-dim); }
+
+  footer{
+    padding:32px 0 48px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono', monospace; font-size:0.75rem; color:var(--muted-dim);
+    flex-wrap:wrap; gap:12px;
+  }
+
+  :focus-visible{ outline:2px solid var(--cool); outline-offset:3px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="nav-name">Manjurul Alam<span class="dot">.</span></div>
+    <nav class="nav-links">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#research">Research</a>
+      <a href="#publications">Publications</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero" style="border-top:none;">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Computational Bioengineer</div>
+        <h1 class="display">Manjurul Alam,<br><em>PhD</em></h1>
+        <p class="hero-thesis">
+          I build patient-specific finite element models of blood vessels to ask a simple
+          question with hard mechanics behind it — <strong>where, and why, does an aneurysm
+          wall fail first.</strong> My work sits at the boundary of applied mathematics,
+          mechanical engineering, and vascular medicine.
+        </p>
+        <div class="cta-row">
+          <a class="pill solid" href="#publications">View publications</a>
+          <a class="pill" href="https://scholar.google.com/citations?user=8rAZplUAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar ↗</a>
+          <a class="pill" href="https://www.linkedin.com/in/manjurul-alam-phd-976390156/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="pill" href="https://www.researchgate.net/profile/Manjurul-Alam" target="_blank" rel="noopener">ResearchGate ↗</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <svg class="mesh-figure" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stylized finite element mesh of an intracranial saccular aneurysm, shaded by wall stress from low (teal) at the base to peak (coral) at the fundus.">
+          <defs>
+            <radialGradient id="stressGrad" cx="62%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#e15b45"/>
+              <stop offset="38%" stop-color="#f2a154"/>
+              <stop offset="75%" stop-color="#2fb5a4"/>
+              <stop offset="100%" stop-color="#1c6f66"/>
+            </radialGradient>
+            <linearGradient id="vesselGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#233040"/>
+              <stop offset="100%" stop-color="#161e27"/>
+            </linearGradient>
+            <clipPath id="sacClip">
+              <path d="M 300 130
+                       C 380 120, 445 165, 452 235
+                       C 460 305, 415 365, 345 385
+                       C 300 397, 255 392, 225 365
+                       C 190 333, 178 280, 195 225
+                       C 212 168, 250 138, 300 130 Z"/>
+            </clipPath>
+          </defs>
+
+          <!-- parent vessel -->
+          <path d="M 40 430 C 140 400, 220 400, 300 385 L 300 430 C 220 448, 140 448, 40 470 Z" fill="url(#vesselGrad)" stroke="var(--line-strong)" stroke-width="1"/>
+          <path d="M 300 385 C 400 405, 490 400, 570 430 L 570 470 C 490 448, 400 448, 300 430 Z" fill="url(#vesselGrad)" stroke="var(--line-strong)" stroke-width="1"/>
+
+          <g class="mesh-pulse">
+            <!-- sac fill -->
+            <path d="M 300 130
+                     C 380 120, 445 165, 452 235
+                     C 460 305, 415 365, 345 385
+                     C 300 397, 255 392, 225 365
+                     C 190 333, 178 280, 195 225
+                     C 212 168, 250 138, 300 130 Z"
+                  fill="url(#stressGrad)" opacity="0.92"/>
+
+            <!-- FEM mesh overlay, clipped to sac -->
+            <g class="mesh-lines" clip-path="url(#sacClip)" stroke="#0a0e13" stroke-opacity="0.55" stroke-width="1">
+              <line x1="150" y1="120" x2="500" y2="470"/>
+              <line x1="190" y1="120" x2="540" y2="470"/>
+              <line x1="230" y1="120" x2="580" y2="470"/>
+              <line x1="270" y1="120" x2="620" y2="470"/>
+              <line x1="110" y1="120" x2="460" y2="470"/>
+              <line x1="70"  y1="120" x2="420" y2="470"/>
+              <line x1="30"  y1="120" x2="380" y2="470"/>
+              <line x1="500" y1="120" x2="150" y2="470"/>
+              <line x1="460" y1="120" x2="110" y2="470"/>
+              <line x1="420" y1="120" x2="70" y2="470"/>
+              <line x1="380" y1="120" x2="30" y2="470"/>
+              <line x1="540" y1="120" x2="190" y2="470"/>
+              <line x1="580" y1="120" x2="230" y2="470"/>
+              <line x1="620" y1="120" x2="270" y2="470"/>
+              <line x1="180" y1="90"  x2="180" y2="500"/>
+              <line x1="240" y1="90"  x2="240" y2="500"/>
+              <line x1="300" y1="90"  x2="300" y2="500"/>
+              <line x1="360" y1="90"  x2="360" y2="500"/>
+              <line x1="420" y1="90"  x2="420" y2="500"/>
+            </g>
+
+            <!-- sac outline -->
+            <path d="M 300 130
+                     C 380 120, 445 165, 452 235
+                     C 460 305, 415 365, 345 385
+                     C 300 397, 255 392, 225 365
+                     C 190 333, 178 280, 195 225
+                     C 212 168, 250 138, 300 130 Z"
+                  fill="none" stroke="#e8eef3" stroke-opacity="0.5" stroke-width="1.5"/>
+          </g>
+
+          <!-- annotations -->
+          <line class="leader" x1="452" y1="150" x2="500" y2="105"/>
+          <text x="504" y="102" class="annot annot-hot">fundus — σ max</text>
+
+          <line class="leader" x1="205" y1="350" x2="150" y2="400"/>
+          <text x="70" y="416" class="annot annot-cool">base — low WSS</text>
+
+          <text x="40" y="60" class="annot" fill="#5f7180">FIG. 01 — idealized saccular aneurysm, meshed</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">About</h2>
+        <span class="section-tag">Bio</span>
+      </div>
+      <div class="about-body">
+        <p>
+          I'm a computational bioengineer trained at the intersection of mechanics and
+          medicine. I hold a <strong>PhD in Bioengineering from George Mason University
+          (2020)</strong> and an <strong>MS in Mechanical Engineering from Southern Illinois
+          University Edwardsville (2016)</strong>. My doctoral work focused on the
+          biomechanics of intracranial saccular aneurysms — using patient-specific,
+          image-based finite element models to quantify how contact constraints from
+          surrounding tissue change stress distribution, and rupture risk, at the aneurysm
+          fundus.
+        </p>
+        <p>
+          Since graduating, I've carried that same discipline into industry — running
+          non-linear FEA for fire-protection hardware, biomechanical simulation for AR/VR
+          products, and mechanical integrity analysis for energy infrastructure. The common
+          thread is turning messy physical geometry into models that can actually inform a
+          clinical or engineering decision. Alongside this, I've spent six years teaching
+          undergraduate engineering coursework, which keeps my explanations honest and my
+          equations legible to people outside my own subfield.
+        </p>
+        <p>
+          I'm currently open to opportunities in <strong>modeling &amp; simulation,
+          computational science, and biomechanics/bioengineering</strong> roles, in
+          industry or academia.
+        </p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-num">4,600+</div>
+          <div class="stat-label">Citations, Google Scholar</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">2020</div>
+          <div class="stat-label">PhD, Bioengineering — GMU</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">5+ yrs</div>
+          <div class="stat-label">Industry FEA &amp; simulation</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">6 yrs</div>
+          <div class="stat-label">Undergraduate teaching</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXPERIENCE ================= -->
+  <section id="experience">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Experience</h2>
+        <span class="section-tag">Industry &amp; research</span>
+      </div>
+
+      <div class="exp-list">
+        <div class="exp-item">
+          <div>
+            <div class="exp-when">Jun 2024 — Present</div>
+            <div class="exp-loc">Orlando, FL</div>
+          </div>
+          <div>
+            <p class="exp-role">Mechanical Integrity and Aeromech Engineer</p>
+            <p class="exp-org">Siemens Energy · Full-time</p>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div>
+            <div class="exp-when">Apr 2023 — Mar 2024</div>
+            <div class="exp-loc">Cranston, RI · On-site</div>
+          </div>
+          <div>
+            <p class="exp-role">Engineering Analyst IV, FEA</p>
+            <p class="exp-org">Johnson Controls · Full-time</p>
+            <ul class="exp-bullets">
+              <li>Extended computer simulation capability from 2D to 3D by introducing non-linear material simulation to validate complex engineering problems in fire suppression products.</li>
+              <li>Supported design engineers in validating new and existing fire-protection designs against agency guidelines.</li>
+              <li>Authored a technical guide for performing non-linear material simulations (rubber, plastic).</li>
+              <li>Supported the company's transition to sustainable product development by reducing simulation cost and eliminating harm.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div>
+            <div class="exp-when">May 2022 — Mar 2023</div>
+            <div class="exp-loc">Redmond, WA · Remote</div>
+          </div>
+          <div>
+            <p class="exp-role">Research Engineer (Mechanical Engineer IV)</p>
+            <p class="exp-org">Meta, via Intelliswift Software Inc · Contract</p>
+            <ul class="exp-bullets">
+              <li>Ran biomechanical simulations in an HPC environment to improve the performance of AR/VR products.</li>
+              <li>Validated biomechanical models for AR/VR products using constitutive models for soft biological facial tissue.</li>
+              <li>Analyzed nonlinear biomechanical simulations of human skin against validated mechanical test data.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div>
+            <div class="exp-when">Jul 2021 — May 2022</div>
+            <div class="exp-loc">Mahwah, NJ</div>
+          </div>
+          <div>
+            <p class="exp-role">Junior Engineer and Scientist</p>
+            <p class="exp-org">Safer World Group · Full-time</p>
+            <ul class="exp-bullets">
+              <li>Designed and tested elastomeric isolation mounts using FEA structural simulations for a NASA/DoD SBIR Phase I ($500K) and Phase II ($1.2M) proposal.</li>
+              <li>Led preparation of internal and external NASA/DoD project reports and documentation.</li>
+              <li>Drove design improvements through experiments, data analysis, and results interpretation.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div>
+            <div class="exp-when">Aug 2016 — Dec 2020</div>
+            <div class="exp-loc">Fairfax, VA</div>
+          </div>
+          <div>
+            <p class="exp-role">Graduate Research Fellow</p>
+            <p class="exp-org">George Mason University · Full-time</p>
+            <ul class="exp-bullets">
+              <li>Led development of computational models simulating idealized and patient-specific structural tissue mechanics using commercial and open-source finite element methods.</li>
+              <li>Ran simulations across CFD, computational solid mechanics, and 3D image processing (OpenFOAM, FEBio, Abaqus, ANSYS Fluent, Comsol, 3D Slicer, R).</li>
+              <li>Modeled non-linear biomechanical behavior of soft tissues and implantable devices, and built simulation geometry in SolidWorks and AutoCAD.</li>
+              <li>Published peer-reviewed manuscripts and presented findings at ASME, APS, BMES, and MDPI conferences.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESEARCH ================= -->
+  <section id="research">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Research focus</h2>
+        <span class="section-tag">What I model</span>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-tag">Vascular biomechanics</span>
+          <h3>Cerebral aneurysm rupture risk</h3>
+          <p>
+            Patient-specific and idealized finite element models of intracranial saccular
+            aneurysms, examining how contact with adjacent nerve tissue and vessel
+            constraints redistribute wall stress near the fundus.
+          </p>
+        </div>
+        <div class="card">
+          <span class="card-tag">Computational hemodynamics</span>
+          <h3>Flow–structure interaction</h3>
+          <p>
+            Image-based 3D reconstruction and simulation of blood vessel geometry to
+            connect flow patterns and wall shear stress to structural failure modes.
+          </p>
+        </div>
+        <div class="card">
+          <span class="card-tag">Devices &amp; sensing</span>
+          <h3>Bio-MEMS &amp; energy harvesting</h3>
+          <p>
+            Finite element analysis of bimorph piezoelectric structures for small-scale
+            energy harvesting, plus bio-separation methods carried over from earlier
+            mechanical engineering work.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PUBLICATIONS ================= -->
+  <section id="publications">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Selected publications</h2>
+        <span class="section-tag">Peer-reviewed</span>
+      </div>
+
+      <div class="pub-list">
+        <div class="pub">
+          <div class="pub-year mono">2021</div>
+          <div>
+            <p class="pub-title">Quantification of the Rupture Potential of Patient-Specific Intracranial Aneurysms under Contact Constraints</p>
+            <p class="pub-meta">Alam M., Mut F., Cebral J.R., Seshaiyer P. — <em>Bioengineering</em>, 8(11), 149.</p>
+            <a class="pub-link" href="https://doi.org/10.3390/bioengineering8110149" target="_blank" rel="noopener">doi.org/10.3390/bioengineering8110149 ↗</a>
+          </div>
+        </div>
+
+        <div class="pub">
+          <div class="pub-year mono">2019</div>
+          <div>
+            <p class="pub-title">Impact of Contact Constraints on the Dynamics of Idealized Intracranial Saccular Aneurysms</p>
+            <p class="pub-meta">Alam M., Seshaiyer P. — <em>Bioengineering</em>, 6(3), 77.</p>
+            <a class="pub-link" href="https://doi.org/10.3390/bioengineering6030077" target="_blank" rel="noopener">doi.org/10.3390/bioengineering6030077 ↗</a>
+          </div>
+        </div>
+
+        <div class="pub">
+          <div class="pub-year mono">2024</div>
+          <div>
+            <p class="pub-title">Global Burden of 288 Causes of Death and Life Expectancy Decomposition in 204 Countries and Territories and 811 Subnational Locations, 1990–2021: A Systematic Analysis for the Global Burden of Disease Study 2021</p>
+            <p class="pub-meta">GBD 2021 Causes of Death Collaborators — <em>The Lancet</em>.</p>
+            <p class="pub-note">Contributing author on this large international consortium study — the primary source of my aggregate citation count.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row" style="margin-top:32px;">
+        <a class="pill" href="https://scholar.google.com/citations?user=8rAZplUAAAAJ&hl=en" target="_blank" rel="noopener">Full list on Google Scholar ↗</a>
+        <a class="pill" href="https://www.researchgate.net/profile/Manjurul-Alam" target="_blank" rel="noopener">ResearchGate ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TIMELINE ================= -->
+  <section id="timeline">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Education &amp; path</h2>
+        <span class="section-tag">Chronological</span>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-when">2014 — 2016</div>
+          <p class="tl-title">MS, Mechanical Engineering</p>
+          <p class="tl-place">Southern Illinois University Edwardsville.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-when">2016 — 2020</div>
+          <p class="tl-title">PhD, Bioengineering</p>
+          <p class="tl-place">George Mason University, Fairfax, VA — dissertation on contact-constrained biomechanics of intracranial saccular aneurysms. Former Student Senator, GMU Student Senate; member, Bangladesh Graduate Student Association.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TOOLKIT ================= -->
+  <section id="toolkit">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Toolkit</h2>
+        <span class="section-tag">Methods</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip">Abaqus</span>
+        <span class="chip">ANSYS Fluent</span>
+        <span class="chip">FEBio</span>
+        <span class="chip">OpenFOAM</span>
+        <span class="chip">Comsol Multiphysics</span>
+        <span class="chip">SolidWorks (GD&amp;T)</span>
+        <span class="chip">AutoCAD</span>
+        <span class="chip">3D Slicer</span>
+        <span class="chip">OpenSim</span>
+        <span class="chip">R</span>
+        <span class="chip">Nonlinear FEA</span>
+        <span class="chip">Computational hemodynamics</span>
+        <span class="chip">Bio-MEMS</span>
+        <span class="chip">Statistical analysis</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section id="contact" class="contact">
+    <div class="wrap contact-inner">
+      <div>
+        <h2 class="section-title">Let's talk mechanics, models, or opportunities.</h2>
+        <p class="contact-sub">
+          Open to modeling &amp; simulation, computational science, and bioengineering
+          roles — in academia or industry.
+        </p>
+      </div>
+      <div class="contact-links">
+        <div class="contact-link-row">
+          <span class="contact-link-label">Scholar</span>
+          <a href="https://scholar.google.com/citations?user=8rAZplUAAAAJ&hl=en" target="_blank" rel="noopener">scholar.google.com ↗</a>
+        </div>
+        <div class="contact-link-row">
+          <span class="contact-link-label">LinkedIn</span>
+          <a href="https://www.linkedin.com/in/manjurul-alam-phd-976390156/" target="_blank" rel="noopener">linkedin.com/in/manjurul-alam-phd ↗</a>
+        </div>
+        <div class="contact-link-row">
+          <span class="contact-link-label">ResearchGate</span>
+          <a href="https://www.researchgate.net/profile/Manjurul-Alam" target="_blank" rel="noopener">researchgate.net ↗</a>
+        </div>
+        <div class="contact-link-row">
+          <span class="contact-link-label">Email</span>
+          <a href="mailto:your.email@example.com">your.email@example.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>© <span id="year"></span> Manjurul Alam, PhD</span>
+  <span>Built with a finite element mesh, not a template.</span>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
