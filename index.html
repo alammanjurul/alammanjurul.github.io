@@ -155,6 +155,41 @@
   /* ---------- HERO VISUAL: aneurysm mesh ---------- */
   .hero-visual{ position:relative; }
   .mesh-figure{ width:100%; height:auto; display:block; }
+
+  /* ---------- HERO PHOTO ---------- */
+  .photo-frame{
+    position:relative;
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+    padding:14px;
+    border-radius:4px;
+  }
+  .photo-frame::before{
+    content:"";
+    position:absolute; inset:0;
+    border:1px solid var(--cool);
+    opacity:0.25;
+    margin:6px;
+    pointer-events:none;
+  }
+  .photo-frame img{
+    display:block;
+    width:100%;
+    height:auto;
+    filter:grayscale(0.15) contrast(1.03);
+    border:1px solid var(--line);
+  }
+  .photo-caption{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:12px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem;
+    letter-spacing:0.03em; color:var(--muted-dim);
+  }
+  .photo-caption .dot-live{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--cool); display:inline-block; margin-right:6px;
+    box-shadow:0 0 0 3px var(--cool-dim);
+  }
   .mesh-pulse{
     transform-origin: 300px 250px;
     animation: pulse 4.2s ease-in-out infinite;
@@ -345,84 +380,13 @@
       </div>
 
       <div class="hero-visual">
-        <svg class="mesh-figure" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stylized finite element mesh of an intracranial saccular aneurysm, shaded by wall stress from low (teal) at the base to peak (coral) at the fundus.">
-          <defs>
-            <radialGradient id="stressGrad" cx="62%" cy="30%" r="75%">
-              <stop offset="0%" stop-color="#e15b45"/>
-              <stop offset="38%" stop-color="#f2a154"/>
-              <stop offset="75%" stop-color="#2fb5a4"/>
-              <stop offset="100%" stop-color="#1c6f66"/>
-            </radialGradient>
-            <linearGradient id="vesselGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#233040"/>
-              <stop offset="100%" stop-color="#161e27"/>
-            </linearGradient>
-            <clipPath id="sacClip">
-              <path d="M 300 130
-                       C 380 120, 445 165, 452 235
-                       C 460 305, 415 365, 345 385
-                       C 300 397, 255 392, 225 365
-                       C 190 333, 178 280, 195 225
-                       C 212 168, 250 138, 300 130 Z"/>
-            </clipPath>
-          </defs>
-
-          <!-- parent vessel -->
-          <path d="M 40 430 C 140 400, 220 400, 300 385 L 300 430 C 220 448, 140 448, 40 470 Z" fill="url(#vesselGrad)" stroke="var(--line-strong)" stroke-width="1"/>
-          <path d="M 300 385 C 400 405, 490 400, 570 430 L 570 470 C 490 448, 400 448, 300 430 Z" fill="url(#vesselGrad)" stroke="var(--line-strong)" stroke-width="1"/>
-
-          <g class="mesh-pulse">
-            <!-- sac fill -->
-            <path d="M 300 130
-                     C 380 120, 445 165, 452 235
-                     C 460 305, 415 365, 345 385
-                     C 300 397, 255 392, 225 365
-                     C 190 333, 178 280, 195 225
-                     C 212 168, 250 138, 300 130 Z"
-                  fill="url(#stressGrad)" opacity="0.92"/>
-
-            <!-- FEM mesh overlay, clipped to sac -->
-            <g class="mesh-lines" clip-path="url(#sacClip)" stroke="#0a0e13" stroke-opacity="0.55" stroke-width="1">
-              <line x1="150" y1="120" x2="500" y2="470"/>
-              <line x1="190" y1="120" x2="540" y2="470"/>
-              <line x1="230" y1="120" x2="580" y2="470"/>
-              <line x1="270" y1="120" x2="620" y2="470"/>
-              <line x1="110" y1="120" x2="460" y2="470"/>
-              <line x1="70"  y1="120" x2="420" y2="470"/>
-              <line x1="30"  y1="120" x2="380" y2="470"/>
-              <line x1="500" y1="120" x2="150" y2="470"/>
-              <line x1="460" y1="120" x2="110" y2="470"/>
-              <line x1="420" y1="120" x2="70" y2="470"/>
-              <line x1="380" y1="120" x2="30" y2="470"/>
-              <line x1="540" y1="120" x2="190" y2="470"/>
-              <line x1="580" y1="120" x2="230" y2="470"/>
-              <line x1="620" y1="120" x2="270" y2="470"/>
-              <line x1="180" y1="90"  x2="180" y2="500"/>
-              <line x1="240" y1="90"  x2="240" y2="500"/>
-              <line x1="300" y1="90"  x2="300" y2="500"/>
-              <line x1="360" y1="90"  x2="360" y2="500"/>
-              <line x1="420" y1="90"  x2="420" y2="500"/>
-            </g>
-
-            <!-- sac outline -->
-            <path d="M 300 130
-                     C 380 120, 445 165, 452 235
-                     C 460 305, 415 365, 345 385
-                     C 300 397, 255 392, 225 365
-                     C 190 333, 178 280, 195 225
-                     C 212 168, 250 138, 300 130 Z"
-                  fill="none" stroke="#e8eef3" stroke-opacity="0.5" stroke-width="1.5"/>
-          </g>
-
-          <!-- annotations -->
-          <line class="leader" x1="452" y1="150" x2="500" y2="105"/>
-          <text x="504" y="102" class="annot annot-hot">fundus — σ max</text>
-
-          <line class="leader" x1="205" y1="350" x2="150" y2="400"/>
-          <text x="70" y="416" class="annot annot-cool">base — low WSS</text>
-
-          <text x="40" y="60" class="annot" fill="#5f7180">FIG. 01 — idealized saccular aneurysm, meshed</text>
-        </svg>
+        <div class="photo-frame">
+          <img src="manjurul-alam.jpg" alt="Portrait of Manjurul Alam, PhD">
+          <div class="photo-caption">
+            <span><span class="dot-live"></span>Manjurul Alam, PhD</span>
+            <span>Computational Bioengineer</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
